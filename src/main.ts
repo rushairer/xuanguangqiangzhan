@@ -53,6 +53,27 @@ app.innerHTML = `
             <p class="guide-intro">从 README 提炼出目标、流程、战斗判定和高频键位，做成能扫读的图解区，而不是纯文字堆叠。</p>
           </div>
 
+          <div class="shot-strip" aria-label="界面截图">
+            <article class="shot-card">
+              <div class="shot-frame">
+                <img src="/guide-shot/start-screen.png" alt="游戏启动前的 Web 界面截图" loading="lazy" />
+              </div>
+              <div class="shot-copy">
+                <strong>启动前界面</strong>
+                <span>进入游戏前会先看到启动卡片，适合新玩家确认舞台区、存档区和说明区布局。</span>
+              </div>
+            </article>
+            <article class="shot-card">
+              <div class="shot-frame">
+                <img src="/guide-shot/loaded-screen.png" alt="游戏启动后的主界面截图" loading="lazy" />
+              </div>
+              <div class="shot-copy">
+                <strong>主界面实拍</strong>
+                <span>启动后会进入 README 所说的主界面，这里可以看到挑战、训练场、购物和模式切换入口。</span>
+              </div>
+            </article>
+          </div>
+
           <div class="art-strip" aria-label="原作素材预览">
             <article class="art-card">
               <img src="${logoArt}" alt="《炫广枪战》原始标题素材" loading="lazy" />
@@ -170,6 +191,87 @@ app.innerHTML = `
               </div>
             </article>
 
+            <article class="guide-card guide-card-tips">
+              <div class="card-heading">
+                <span class="card-index">05</span>
+                <div>
+                  <h3>提示</h3>
+                  <p>这一组是 README 里容易被忽略，但实战时最影响体验的提醒。</p>
+                </div>
+              </div>
+              <div class="hint-list">
+                <div class="hint-item">
+                  <span class="hint-marker">上</span>
+                  <p>如果觉得太难，可以按 <strong>上方向键</strong> 调节难度。</p>
+                </div>
+                <div class="hint-item">
+                  <span class="hint-marker">购</span>
+                  <p>当子弹不足时，购物提示会出现，小心突然没子弹。</p>
+                </div>
+                <div class="hint-item">
+                  <span class="hint-marker">奖</span>
+                  <p>道具可以通过 <strong>签到</strong> 和 <strong>打怪</strong> 获取。</p>
+                </div>
+              </div>
+            </article>
+
+            <article class="guide-card guide-card-codes">
+              <div class="card-heading">
+                <span class="card-index">07</span>
+                <div>
+                  <h3>姓名编号</h3>
+                  <p>搜索人物时需要对照编号。这里把 README 的姓编号和名编号浓缩成对照表。</p>
+                </div>
+              </div>
+              <div class="code-groups">
+                <section class="code-group">
+                  <h4>姓编号</h4>
+                  <div class="code-chip-list">
+                    <span class="code-chip">1=王</span>
+                    <span class="code-chip">2=李</span>
+                    <span class="code-chip">3=张</span>
+                    <span class="code-chip">4=刘</span>
+                    <span class="code-chip">5=陈</span>
+                    <span class="code-chip">6=赵</span>
+                    <span class="code-chip">7=孙</span>
+                    <span class="code-chip">8=徐</span>
+                    <span class="code-chip">9=杨</span>
+                    <span class="code-chip">10=林</span>
+                  </div>
+                </section>
+                <section class="code-group">
+                  <h4>名编号</h4>
+                  <div class="code-chip-list">
+                    <span class="code-chip">1=新焰</span>
+                    <span class="code-chip">2=灿薇</span>
+                    <span class="code-chip">3=金光</span>
+                    <span class="code-chip">4=明月</span>
+                    <span class="code-chip">5=愿采</span>
+                    <span class="code-chip">6=夜削</span>
+                    <span class="code-chip">7=会缘</span>
+                    <span class="code-chip">8=颖晗</span>
+                    <span class="code-chip">9=晓妍</span>
+                    <span class="code-chip">10=焰</span>
+                    <span class="code-chip">11=君</span>
+                    <span class="code-chip">12=玲</span>
+                    <span class="code-chip">13=宏波</span>
+                    <span class="code-chip">14=炫炫</span>
+                    <span class="code-chip">15=队长</span>
+                    <span class="code-chip">16=浩杰</span>
+                    <span class="code-chip">17=羽莉</span>
+                    <span class="code-chip">18=珈豪</span>
+                    <span class="code-chip">19=承达</span>
+                    <span class="code-chip">20=玥萱</span>
+                    <span class="code-chip">21=文</span>
+                    <span class="code-chip">22=童</span>
+                    <span class="code-chip">23=傲</span>
+                    <span class="code-chip">24=梦</span>
+                    <span class="code-chip">25=伟</span>
+                  </div>
+                </section>
+              </div>
+            </article>
+
             <article class="guide-card guide-card-controls">
               <div class="card-heading">
                 <span class="card-index">04</span>
@@ -236,6 +338,21 @@ app.innerHTML = `
                   </section>
                 </div>
               </details>
+            </article>
+
+            <article class="guide-card guide-card-mod">
+              <div class="card-heading">
+                <span class="card-index">08</span>
+                <div>
+                  <h3>模组</h3>
+                  <p>README 的模组说明比较短，但不应该在 UI 里缺席。</p>
+                </div>
+              </div>
+              <div class="mod-note">
+                <strong>安装方式</strong>
+                <p>打开“炫广组件”里的文件即可安装模组，并按说明拖拽积木。</p>
+              </div>
+              <p class="mod-subnote">这部分更适合后续补一张组件界面截图；当前先保留文字入口，避免说明书断层。</p>
             </article>
           </div>
         </section>

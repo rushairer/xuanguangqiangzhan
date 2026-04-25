@@ -513,6 +513,53 @@ canvas:focus {
   gap: 16px;
 }
 
+.shot-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.shot-card {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid rgba(255, 232, 161, 0.16);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255, 242, 192, 0.08), rgba(255, 242, 192, 0.03));
+}
+
+.shot-frame {
+  overflow: hidden;
+  border: 1px solid rgba(255, 226, 124, 0.14);
+  border-radius: 18px;
+  background: rgba(5, 8, 4, 0.82);
+  aspect-ratio: 16 / 10;
+}
+
+.shot-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+
+.shot-copy {
+  display: grid;
+  gap: 5px;
+}
+
+.shot-copy strong {
+  color: #fff0bc;
+}
+
+.shot-copy span {
+  color: #cbbf9a;
+  line-height: 1.45;
+}
+
 .art-strip {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -601,6 +648,9 @@ canvas:focus {
 
 .goal-badge,
 .legend-list span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   padding: 10px 12px;
   border: 1px solid rgba(255, 226, 124, 0.18);
   border-radius: 999px;
@@ -613,6 +663,7 @@ canvas:focus {
   display: flex;
   gap: 12px;
   align-items: center;
+  min-height: 68px;
   padding: 12px 14px;
   border-radius: 18px;
   background: rgba(7, 10, 6, 0.72);
@@ -685,6 +736,7 @@ canvas:focus {
 .flow-node {
   display: grid;
   gap: 4px;
+  min-height: 82px;
 }
 
 .flow-node strong,
@@ -758,6 +810,7 @@ canvas:focus {
 .control-group {
   display: grid;
   gap: 10px;
+  align-content: start;
 }
 
 .control-group h4 {
@@ -835,6 +888,87 @@ canvas:focus {
   margin-top: 8px;
 }
 
+.hint-list,
+.code-groups {
+  display: grid;
+  gap: 12px;
+}
+
+.hint-item,
+.mod-note,
+.code-group {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+  min-height: 74px;
+  padding: 14px;
+  border: 1px solid rgba(255, 226, 124, 0.15);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.hint-item p,
+.mod-note p,
+.mod-subnote {
+  margin: 0;
+  color: #cfc29b;
+  line-height: 1.5;
+}
+
+.hint-marker,
+.code-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 226, 124, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 226, 124, 0.09);
+  color: #fff1bf;
+  font-weight: 800;
+}
+
+.hint-marker {
+  min-width: 38px;
+}
+
+.code-group {
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+.code-group h4 {
+  margin: 0;
+  color: #fff0bc;
+}
+
+.code-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.code-chip {
+  min-height: 36px;
+  font-weight: 700;
+}
+
+.mod-note {
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+.mod-note strong {
+  color: #fff0bc;
+}
+
+.mod-subnote {
+  color: #978d70;
+}
+
 @media (max-width: 900px) {
   .panel {
     grid-template-columns: 1fr;
@@ -846,6 +980,7 @@ canvas:focus {
   }
 
   .guide-grid,
+  .shot-strip,
   .control-columns,
   .manual-grid,
   .art-strip {
