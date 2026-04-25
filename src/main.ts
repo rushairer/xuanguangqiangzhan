@@ -44,6 +44,22 @@ app.innerHTML = `
               </div>
             </div>
           </div>
+          <div class="tutorial-layer hidden" id="tutorial-layer" aria-live="polite">
+            <div class="tutorial-target" id="tutorial-target"></div>
+            <div class="tutorial-arrow" id="tutorial-arrow"></div>
+            <section class="tutorial-card" id="tutorial-card">
+              <div class="tutorial-stepbar">
+                <span class="tutorial-step" id="tutorial-step">新手引导 1 / 5</span>
+                <button class="tutorial-skip" id="tutorial-skip" type="button">跳过</button>
+              </div>
+              <h3 id="tutorial-title">首次进入新手引导</h3>
+              <p id="tutorial-body">先熟悉主界面，再去挑战会顺很多。</p>
+              <div class="tutorial-actions">
+                <button class="tutorial-button ghost" id="tutorial-prev" type="button">上一步</button>
+                <button class="tutorial-button" id="tutorial-next" type="button">下一步</button>
+              </div>
+            </section>
+          </div>
         </div>
 
         <section class="guide-board" aria-label="游戏说明">
@@ -388,6 +404,7 @@ app.innerHTML = `
           <span><strong>鼠标：</strong>点击舞台触发角色点击事件</span>
           <span><strong>存档：</strong>浏览器本地手动保存，可导入/导出备份</span>
         </div>
+        <button class="utility-button tutorial-reopen" id="tutorial-reopen" type="button">重新打开新手引导</button>
         <p class="status runtime-note" id="status">待启动。首次加载会解析 project.json 和全部角色素材。</p>
       </aside>
     </section>
@@ -402,6 +419,17 @@ const loadingCard = document.querySelector<HTMLDivElement>('#loading-card');
 const loadingMessage = document.querySelector<HTMLParagraphElement>('#loading-message');
 const progressFill = document.querySelector<HTMLDivElement>('#progress-fill');
 const status = document.querySelector<HTMLParagraphElement>('#status');
+const tutorialLayer = document.querySelector<HTMLDivElement>('#tutorial-layer');
+const tutorialTarget = document.querySelector<HTMLDivElement>('#tutorial-target');
+const tutorialArrow = document.querySelector<HTMLDivElement>('#tutorial-arrow');
+const tutorialCard = document.querySelector<HTMLElement>('#tutorial-card');
+const tutorialStep = document.querySelector<HTMLSpanElement>('#tutorial-step');
+const tutorialTitle = document.querySelector<HTMLHeadingElement>('#tutorial-title');
+const tutorialBody = document.querySelector<HTMLParagraphElement>('#tutorial-body');
+const tutorialPrevButton = document.querySelector<HTMLButtonElement>('#tutorial-prev');
+const tutorialNextButton = document.querySelector<HTMLButtonElement>('#tutorial-next');
+const tutorialSkipButton = document.querySelector<HTMLButtonElement>('#tutorial-skip');
+const tutorialReopenButton = document.querySelector<HTMLButtonElement>('#tutorial-reopen');
 const saveStatus = document.querySelector<HTMLParagraphElement>('#save-status');
 const saveSlotSelect = document.querySelector<HTMLSelectElement>('#save-slot-select');
 const manualSaveButton = document.querySelector<HTMLButtonElement>('#manual-save');
@@ -427,6 +455,17 @@ if (
   !loadingMessage ||
   !progressFill ||
   !status ||
+  !tutorialLayer ||
+  !tutorialTarget ||
+  !tutorialArrow ||
+  !tutorialCard ||
+  !tutorialStep ||
+  !tutorialTitle ||
+  !tutorialBody ||
+  !tutorialPrevButton ||
+  !tutorialNextButton ||
+  !tutorialSkipButton ||
+  !tutorialReopenButton ||
   !saveStatus ||
   !saveSlotSelect ||
   !manualSaveButton ||
@@ -454,6 +493,17 @@ const loadingPanel = loadingCard;
 const loadingText = loadingMessage;
 const progressBar = progressFill;
 const statusPanel = status;
+const tutorialLayerPanel = tutorialLayer;
+const tutorialTargetMarker = tutorialTarget;
+const tutorialArrowMarker = tutorialArrow;
+const tutorialCardPanel = tutorialCard;
+const tutorialStepPanel = tutorialStep;
+const tutorialTitlePanel = tutorialTitle;
+const tutorialBodyPanel = tutorialBody;
+const tutorialPrevControl = tutorialPrevButton;
+const tutorialNextControl = tutorialNextButton;
+const tutorialSkipControl = tutorialSkipButton;
+const tutorialReopenControl = tutorialReopenButton;
 const saveStatusPanel = saveStatus;
 const saveSlotControl = saveSlotSelect;
 const manualSaveControl = manualSaveButton;
@@ -473,6 +523,90 @@ const answerInput = askInput;
 let started = false;
 let runtime: GameHandle | null = null;
 let lastPersistenceStatus: RuntimePersistenceStatus | null = null;
+let tutorialStepIndex = 0;
+
+const TUTORIAL_STORAGE_KEY = 'mindplus-web-runtime:炫广枪战:onboarding:v1';
+
+type TutorialStep = {
+  title: string;
+  body: string;
+  nextLabel: string;
+  target?: TutorialTargetDescriptor;
+  cardPosition?: 'left' | 'right' | 'center';
+};
+
+type TutorialTargetRect = {left: number; top: number; width: number; height: number};
+
+type TutorialTargetDescriptor =
+  | {
+      kind: 'sprite';
+      spriteName: string;
+      padding?: Partial<{left: number; right: number; top: number; bottom: number}>;
+      fallback?: TutorialTargetRect;
+    }
+  | {
+      kind: 'monitor';
+      monitorName: string;
+      padding?: number;
+      fallback?: TutorialTargetRect;
+    };
+
+const tutorialSteps: TutorialStep[] = [
+  {
+    title: '先睡觉，再继续',
+    body: '箭头指向主界面的“睡觉”按钮。首次进入时，先点它完成睡觉流程；完成后再继续下一步。',
+    nextLabel: '我睡醒了',
+    target: {
+      kind: 'sprite',
+      spriteName: 'shuij',
+      padding: {left: 10, right: 10, top: 8, bottom: 8},
+      fallback: {left: 17.2, top: 31, width: 9.2, height: 6.6}
+    },
+    cardPosition: 'right'
+  },
+  {
+    title: '接着去改名',
+    body: '睡醒后，箭头会移到“改名”按钮。先改一个你想要的人物名字，后面查看主人信息时会更直观。',
+    nextLabel: '已改名',
+    target: {
+      kind: 'sprite',
+      spriteName: 'gm',
+      padding: {left: 10, right: 10, top: 8, bottom: 8},
+      fallback: {left: 4.8, top: 31, width: 11.5, height: 6.6}
+    },
+    cardPosition: 'right'
+  },
+  {
+    title: '记住右方向键功能',
+    body: '主界面里按右方向键可以切换人物。后面你要看不同人物、继续挑战或对照姓名编号时，这个操作很常用。',
+    nextLabel: '知道了',
+    cardPosition: 'center'
+  },
+  {
+    title: '看左上角主人组件',
+    body: '箭头指向左上角“新夜怪主人”组件。这里会显示当前主人相关信息，是你确认名字和当前人物状态的第一入口。',
+    nextLabel: '继续',
+    target: {
+      kind: 'monitor',
+      monitorName: '新夜怪主人',
+      padding: 8,
+      fallback: {left: 0.8, top: 0.8, width: 16.8, height: 5.1}
+    },
+    cardPosition: 'right'
+  },
+  {
+    title: '准备进入挑战',
+    body: '箭头现在指向“挑战”按钮。进入战斗后要记住：Space 开枪，G/V/C/B 上下左右移动，Z+Space 放绝招，Q/W/E/X 是四类招式，K 召唤好友，M 蓄力。',
+    nextLabel: '开始挑战',
+    target: {
+      kind: 'sprite',
+      spriteName: 'tz',
+      padding: {left: 10, right: 10, top: 8, bottom: 8},
+      fallback: {left: 17.1, top: 23.8, width: 9.5, height: 6.5}
+    },
+    cardPosition: 'right'
+  }
+];
 
 function monitorName(monitor: ScratchMonitor): string {
   return monitor.params?.VARIABLE ?? monitor.params?.LIST ?? monitor.id;
@@ -645,10 +779,15 @@ function renderMonitors(monitors: ScratchMonitor[]): void {
       isListMonitor(monitor) ? 'monitor-list' : '',
       longValue ? 'monitor-long' : ''
     ].filter(Boolean).join(' ');
+    node.dataset.monitorName = monitorName(monitor);
     node.style.left = `${Math.max(0, Math.min(100, ((monitor.x ?? 5) / 480) * 100))}%`;
     node.style.top = `${Math.max(0, Math.min(100, ((monitor.y ?? 5) / 360) * 100))}%`;
     renderMonitorContent(node, monitor);
     monitorsRoot.append(node);
+  }
+
+  if (!tutorialLayerPanel.classList.contains('hidden')) {
+    renderTutorialStep();
   }
 }
 
@@ -727,6 +866,141 @@ function showQuestion(question: string | null): void {
   answerInput.focus();
 }
 
+function setTutorialSeen(): void {
+  localStorage.setItem(TUTORIAL_STORAGE_KEY, JSON.stringify({completedAt: Date.now()}));
+}
+
+function hasSeenTutorial(): boolean {
+  return Boolean(localStorage.getItem(TUTORIAL_STORAGE_KEY));
+}
+
+function hideTutorial(): void {
+  tutorialLayerPanel.classList.add('hidden');
+  tutorialCardPanel.dataset.position = 'center';
+  stageCanvas.focus();
+}
+
+function clampPercent(value: number): number {
+  return Math.max(0, Math.min(100, value));
+}
+
+function scratchRectToOverlayRect(bounds: {left: number; right: number; top: number; bottom: number}): TutorialTargetRect {
+  return {
+    left: clampPercent(((bounds.left + 240) / 480) * 100),
+    top: clampPercent(((180 - bounds.top) / 360) * 100),
+    width: clampPercent(((bounds.right - bounds.left) / 480) * 100),
+    height: clampPercent(((bounds.top - bounds.bottom) / 360) * 100)
+  };
+}
+
+function resolveSpriteTargetRect(
+  spriteName: string,
+  padding: Partial<{left: number; right: number; top: number; bottom: number}> = {}
+): TutorialTargetRect | null {
+  if (!runtime?.vm?.runtime?.targets) return null;
+  const target = runtime.vm.runtime.targets.find((candidate: any) => candidate.sprite?.name === spriteName);
+  if (!target?.visible) return null;
+
+  const bounds =
+    typeof target.getBounds === 'function'
+      ? target.getBounds()
+      : target.drawableID != null && runtime.vm.runtime.renderer?.getBounds
+        ? runtime.vm.runtime.renderer.getBounds(target.drawableID)
+        : null;
+
+  if (!bounds) return null;
+
+  return scratchRectToOverlayRect({
+    left: bounds.left - (padding.left ?? 0),
+    right: bounds.right + (padding.right ?? 0),
+    top: bounds.top + (padding.top ?? 0),
+    bottom: bounds.bottom - (padding.bottom ?? 0)
+  });
+}
+
+function resolveMonitorTargetRect(monitorNameText: string, padding = 0): TutorialTargetRect | null {
+  const monitorNode = monitorsRoot.querySelector<HTMLElement>(`.monitor[data-monitor-name="${CSS.escape(monitorNameText)}"]`);
+  if (!monitorNode) return null;
+
+  const hostRect = tutorialLayerPanel.getBoundingClientRect();
+  const rect = monitorNode.getBoundingClientRect();
+  if (hostRect.width === 0 || hostRect.height === 0 || rect.width === 0 || rect.height === 0) {
+    return null;
+  }
+
+  return {
+    left: clampPercent(((rect.left - hostRect.left - padding) / hostRect.width) * 100),
+    top: clampPercent(((rect.top - hostRect.top - padding) / hostRect.height) * 100),
+    width: clampPercent(((rect.width + padding * 2) / hostRect.width) * 100),
+    height: clampPercent(((rect.height + padding * 2) / hostRect.height) * 100)
+  };
+}
+
+function resolveTutorialTarget(target: TutorialTargetDescriptor): TutorialTargetRect | null {
+  if (target.kind === 'sprite') {
+    return resolveSpriteTargetRect(target.spriteName, target.padding) ?? target.fallback ?? null;
+  }
+
+  return resolveMonitorTargetRect(target.monitorName, target.padding) ?? target.fallback ?? null;
+}
+
+function renderTutorialStep(): void {
+  const step = tutorialSteps[tutorialStepIndex];
+  tutorialLayerPanel.classList.remove('hidden');
+  tutorialStepPanel.textContent = `新手引导 ${tutorialStepIndex + 1} / ${tutorialSteps.length}`;
+  tutorialTitlePanel.textContent = step.title;
+  tutorialBodyPanel.textContent = step.body;
+  tutorialPrevControl.disabled = tutorialStepIndex === 0;
+  tutorialNextControl.textContent = step.nextLabel;
+  tutorialCardPanel.dataset.position = step.cardPosition ?? 'center';
+
+  if (!step.target) {
+    tutorialTargetMarker.classList.add('hidden');
+    tutorialArrowMarker.classList.add('hidden');
+    return;
+  }
+
+  const targetRect = resolveTutorialTarget(step.target);
+  if (!targetRect) {
+    tutorialTargetMarker.classList.add('hidden');
+    tutorialArrowMarker.classList.add('hidden');
+    return;
+  }
+
+  tutorialTargetMarker.classList.remove('hidden');
+  tutorialArrowMarker.classList.remove('hidden');
+  tutorialTargetMarker.style.left = `${targetRect.left}%`;
+  tutorialTargetMarker.style.top = `${targetRect.top}%`;
+  tutorialTargetMarker.style.width = `${targetRect.width}%`;
+  tutorialTargetMarker.style.height = `${targetRect.height}%`;
+  tutorialArrowMarker.style.left = `${targetRect.left + targetRect.width / 2}%`;
+  tutorialArrowMarker.style.top = `${Math.max(4, targetRect.top - 8)}%`;
+}
+
+function startTutorial(force = false): void {
+  if (!started || !runtime) return;
+  if (!force && hasSeenTutorial()) return;
+  tutorialStepIndex = 0;
+  renderTutorialStep();
+}
+
+function advanceTutorial(): void {
+  if (tutorialStepIndex >= tutorialSteps.length - 1) {
+    setTutorialSeen();
+    hideTutorial();
+    return;
+  }
+
+  tutorialStepIndex += 1;
+  renderTutorialStep();
+}
+
+function rewindTutorial(): void {
+  if (tutorialStepIndex === 0) return;
+  tutorialStepIndex -= 1;
+  renderTutorialStep();
+}
+
 answerForm.addEventListener('submit', event => {
   event.preventDefault();
   if (!runtime) return;
@@ -734,6 +1008,19 @@ answerForm.addEventListener('submit', event => {
   answerForm.classList.add('hidden');
   answerInput.value = '';
   stageCanvas.focus();
+});
+
+tutorialPrevControl.addEventListener('click', rewindTutorial);
+tutorialNextControl.addEventListener('click', advanceTutorial);
+tutorialSkipControl.addEventListener('click', () => {
+  setTutorialSeen();
+  hideTutorial();
+});
+tutorialReopenControl.addEventListener('click', () => startTutorial(true));
+window.addEventListener('resize', () => {
+  if (!tutorialLayerPanel.classList.contains('hidden')) {
+    renderTutorialStep();
+  }
 });
 
 manualSaveControl.addEventListener('click', () => {
@@ -826,6 +1113,7 @@ startControl.addEventListener('click', async () => {
     statusPanel.textContent = `已启动 · Scratch 兼容速度：${SCRATCH_COMPATIBILITY_MODE ? '30Hz' : '60Hz'}`;
     renderSaveSlots();
     stageCanvas.focus();
+    window.setTimeout(() => startTutorial(), 450);
   } catch (error) {
     started = false;
     runtime = null;
