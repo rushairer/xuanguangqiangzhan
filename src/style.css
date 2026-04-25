@@ -300,6 +300,7 @@ canvas:focus {
 
 .tutorial-target {
   position: absolute;
+  pointer-events: none;
   border: 2px solid rgba(255, 210, 95, 0.95);
   border-radius: 18px;
   box-shadow:
@@ -310,6 +311,7 @@ canvas:focus {
 
 .tutorial-arrow {
   position: absolute;
+  pointer-events: none;
   width: 30px;
   height: 84px;
   transform: translateX(-50%);
